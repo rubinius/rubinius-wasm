@@ -1,0 +1,21 @@
+
+============= :__script__ ==============
+Arguments:   0 required, 0 post, 0 total
+Arity:       0
+Locals:      0
+Stack size:  2
+Registers:   0
+Literals:    2: "Hello World", :puts
+Lines to IP: 1: 0..15
+
+0000:  push_self                  
+0001:  push_literal               "Hello World"
+0003:  string_dup                 
+0004:  unwind                     0
+0006:  allow_private              
+0007:  send_stack                 :puts, 1
+0010:  unwind                     0
+0012:  pop                        
+0013:  push_true                  
+0014:  ret                        0
+----------------------------------------
