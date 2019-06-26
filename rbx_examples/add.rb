@@ -1,1 +1,5 @@
-a = 3 + 2
+def add(a,b)
+  a+b
+end
+
+add(2,3)
