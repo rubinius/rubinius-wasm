@@ -40,7 +40,7 @@ INSN_TMPL = '(data 0 (i32.const %d) %s) ;; %d'
 
 class Integer
   def to_little_endian(byte_count)
-    ("%0#{byte_count*2}X" % self).scan(/../).reverse.map {|byte| "Ox#{byte}"}
+    ("%0#{byte_count*2}X" % self).scan(/../).reverse.map {|byte| "0x#{byte}"}.join(' ')
   end
 end
 
@@ -63,8 +63,6 @@ names_subset.each do |name|
   name_data << "(data 0 (i32.const #{addr}) \"#{name}\\00\")"
   addr += name.to_s.size + 1
 end
-puts name_data.join("\n")
-
 
 # Round addr to the next 4 bytes aligned location
 addr = (addr & ~3) + 4
