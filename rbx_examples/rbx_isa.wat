@@ -4,7 +4,8 @@
   ;; For now we store registers 
   (memory 0 1)
 
-  (global $HB (const i32) (i32.const 1024)) ;; heap base address
+  (global $TEXT (const i32) (i32.const 5170))  ;; rbx program opcodes
+  (global $HEAP (const i32) (i32.const 10024)) ;; heap base address
 
   ;; For now we don't have all the interpreter machinery
   ;; implemented to allocate dynamically the call frame
@@ -16,11 +17,11 @@
   ;;
   ;; Offsets below are relative to the Call Frame structure
   (data 0 (i32.const 0)  0x00 0x00 0x00 0x00)  ;; Previous CF offset
-  (data 0 (i32.const 4)  0x00 0x00 0x00 0x00)  ;; IP offset (0)
-  (data 0 (i32.const 8)  0x08 0x00 0x00 0x00)  ;; Registers Offset (8)
-  (data 0 (i32.const 12) 0x0B 0x00 0x00 0x00)  ;; Locals Offset (72)
+  (data 0 (i32.const 4)  0x04 0x00 0x00 0x00)  ;; IP offset (4)
+  (data 0 (i32.const 8)  0x0C 0x00 0x00 0x00)  ;; Registers Offset (12)
+  (data 0 (i32.const 12) 0x84 0x00 0x00 0x00)  ;; Locals Offset (76)
 
-  ;;...some free space
+  ;; %% BEGINNING OF GENERATED INTRUCTION SET DATA %%
   ;; Instructions
   ;;    > Instruction names
   (data 0 (i32.const 64) "b_if\00") 
@@ -45,112 +46,111 @@
   ;;   - opcode (= instruction unique code) (i16)
   ;;   - index in table function (i32)
   ;;-------
-  ;; b_if
+  ;; b_if r, label
   (data 0 (i32.const 512) 0x40 0x00 0x00 0x00) ;; 64
-  (data 0 (i32.const 516) 0x01 0x00 0x00 0x00) ;; 2
+  (data 0 (i32.const 516) 0x02 0x00 0x00 0x00) ;; 2
   (data 0 (i32.const 520) 0x7e 0x00 0x00 0x00) ;; 126
   (data 0 (i32.const 524) 0x00 0x00 0x00 0x00) ;; 0
+  ;; goto label
+  (data 0 (i32.const 528) 0x45 0x00 0x00 0x00) ;; 69
+  (data 0 (i32.const 532) 0x01 0x00 0x00 0x00) ;; 1
+  (data 0 (i32.const 536) 0x11 0x00 0x00 0x00) ;; 17
+  (data 0 (i32.const 540) 0x01 0x00 0x00 0x00) ;; 1
+  ;; goto_past label
+  (data 0 (i32.const 544) 0x45 0x00 0x00 0x00) ;; 74
+  (data 0 (i32.const 548) 0x01 0x00 0x00 0x00) ;; 1
+  (data 0 (i32.const 552) 0xb5 0x00 0x00 0x00) ;; 181
+  (data 0 (i32.const 556) 0x02 0x00 0x00 0x00) ;; 2
+  ;; n_iadd r1, r2, r3
+  (data 0 (i32.const 560) 0x54 0x00 0x00 0x00) ;; 84
+  (data 0 (i32.const 564) 0x03 0x00 0x00 0x00) ;; 3
+  (data 0 (i32.const 568) 0x89 0x00 0x00 0x00) ;; 137
+  (data 0 (i32.const 572) 0x03 0x00 0x00 0x00) ;; 3  
+  ;; n_ile r1, r2, r3
+  (data 0 (i32.const 576) 0x5b 0x00 0x00 0x00) ;; 91
+  (data 0 (i32.const 580) 0x03 0x00 0x00 0x00) ;; 3
+  (data 0 (i32.const 584) 0x94 0x00 0x00 0x00) ;; 148
+  (data 0 (i32.const 588) 0x04 0x00 0x00 0x00) ;; 4  
+  ;; n_ilt r1, r2, r3
+  (data 0 (i32.const 592) 0x61 0x00 0x00 0x00) ;; 97
+  (data 0 (i32.const 596) 0x03 0x00 0x00 0x00) ;; 3
+  (data 0 (i32.const 600) 0x93 0x00 0x00 0x00) ;; 147
+  (data 0 (i32.const 604) 0x05 0x00 0x00 0x00) ;; 5
+  ;; r_copy r1, r2
+  (data 0 (i32.const 608) 0x67 0x00 0x00 0x00) ;; 103
+  (data 0 (i32.const 612) 0x02 0x00 0x00 0x00) ;; 2
+  (data 0 (i32.const 616) 0x88 0x00 0x00 0x00) ;; 136
+  (data 0 (i32.const 620) 0x06 0x00 0x00 0x00) ;; 6 
+  ;; r_load_1 r1
+  (data 0 (i32.const 624) 0x6e 0x00 0x00 0x00) ;; 110
+  (data 0 (i32.const 628) 0x01 0x00 0x00 0x00) ;; 1
+  (data 0 (i32.const 632) 0xb8 0x00 0x00 0x00) ;; 184
+  (data 0 (i32.const 636) 0x07 0x00 0x00 0x00) ;; 7 
+  ;; r_load_int r1, r2
+  (data 0 (i32.const 640) 0x77 0x00 0x00 0x00) ;; 119
+  (data 0 (i32.const 644) 0x02 0x00 0x00 0x00) ;; 2
+  (data 0 (i32.const 648) 0x86 0x00 0x00 0x00) ;; 134
+  (data 0 (i32.const 652) 0x08 0x00 0x00 0x00) ;; 8
+  ;; r_load_local r1, ip
+  (data 0 (i32.const 656) 0x82 0x00 0x00 0x00) ;; 130
+  (data 0 (i32.const 660) 0x02 0x00 0x00 0x00) ;; 2
+  (data 0 (i32.const 664) 0x7f 0x00 0x00 0x00) ;; 127
+  (data 0 (i32.const 668) 0x09 0x00 0x00 0x00) ;; 9
+  ;; r_store_int r1, r2
+  (data 0 (i32.const 672) 0x8f 0x00 0x00 0x00) ;; 143
+  (data 0 (i32.const 676) 0x02 0x00 0x00 0x00) ;; 2
+  (data 0 (i32.const 680) 0x87 0x00 0x00 0x00) ;; 135
+  (data 0 (i32.const 684) 0x0a 0x00 0x00 0x00) ;; 10  
+  ;; r_store_stack r
+  (data 0 (i32.const 688) 0x9b 0x00 0x00 0x00) ;; 155
+  (data 0 (i32.const 692) 0x01 0x00 0x00 0x00) ;; 1
+  (data 0 (i32.const 696) 0x84 0x00 0x00 0x00) ;; 132
+  (data 0 (i32.const 700) 0x0a 0x00 0x00 0x00) ;; 11  
+  ;; ret
+  (data 0 (i32.const 704) 0xa9 0x00 0x00 0x00) ;; 169
+  (data 0 (i32.const 708) 0x00 0x00 0x00 0x00) ;; 0
+  (data 0 (i32.const 712) 0x46 0x00 0x00 0x00) ;; 70
+  (data 0 (i32.const 716) 0x0b 0x00 0x00 0x00) ;; 12    
+  
+    ;; %% END OF GENERATED INTRUCTION SET DATA %%
 
+  ;; Rbx program opcodes loading
+  ;; for now it's implemented by hand
+  (data 0 (i32 const 5170) )
 
   ;; This is where heap base starts
-  ;; Memory 1024 and beyond
+  ;; Memory 10024 and beyond
   ;;
   ;; Call Frames are **HARCODED FOR NOW** (TODO: make it dynamic)
   ;; Call Frame 0 (IP + 8 registers + 8 locals)
-  (data 0 (i32.const 1024) "\00\00\00\00") ;; Previous CF offset (0x00000000 means bottom CF)
-  (data 0 (i32.const 1032) "\00\00\00\00\00\00\00\00") ;; IP
+  (data 0 (i32.const 10024) "\00\00\00\00") ;; Previous CF address (0x00000000 means bottom CF)
+  (data 0 (i32.const 10028) "\00\00\00\00\00\00\00\00") ;; IP
   ;;
-  (data 0 (i32.const 1040) "\00\00\00\00\00\00\00\00") ;; R0 = 0
-  (data 0 (i32.const 1048) "\00\00\00\00\00\00\00\00") ;; R1 = 0
-  (data 0 (i32.const 1056) "\00\00\00\00\00\00\00\00") ;; R2 = 0
-  (data 0 (i32.const 1064) "\00\00\00\00\00\00\00\00") ;; R3 = 0
-  (data 0 (i32.const 1072) "\00\00\00\00\00\00\00\00") ;; R4 = 0
-  (data 0 (i32.const 1080) "\00\00\00\00\00\00\00\00") ;; R5 = 0
-  (data 0 (i32.const 1088) "\00\00\00\00\00\00\00\00") ;; R6 = 0
-  (data 0 (i32.const 1096) "\00\00\00\00\00\00\00\00") ;; R7 = 0
+  (data 0 (i32.const 10036) "\00\00\00\00\00\00\00\00") ;; R0 = 0
+  (data 0 (i32.const 10044) "\00\00\00\00\00\00\00\00") ;; R1 = 0
+  (data 0 (i32.const 10052) "\00\00\00\00\00\00\00\00") ;; R2 = 0
+  (data 0 (i32.const 10060) "\00\00\00\00\00\00\00\00") ;; R3 = 0
+  (data 0 (i32.const 10068) "\00\00\00\00\00\00\00\00") ;; R4 = 0
+  (data 0 (i32.const 10076) "\00\00\00\00\00\00\00\00") ;; R5 = 0
+  (data 0 (i32.const 10084) "\00\00\00\00\00\00\00\00") ;; R6 = 0
+  (data 0 (i32.const 10092) "\00\00\00\00\00\00\00\00") ;; R7 = 0
   ;;
-  (data 0 (i32.const 1104) "\00\00\00\00\00\00\00\00") ;; Local0 = 0
-  (data 0 (i32.const 1112) "\00\00\00\00\00\00\00\00") ;; Local1 = 0
-  (data 0 (i32.const 1120) "\00\00\00\00\00\00\00\00") ;; Local2 = 0
-  (data 0 (i32.const 1128) "\00\00\00\00\00\00\00\00") ;; Local3 = 0
-  (data 0 (i32.const 1136) "\00\00\00\00\00\00\00\00") ;; Local4 = 0
-  (data 0 (i32.const 1144) "\00\00\00\00\00\00\00\00") ;; Local5 = 0
-  (data 0 (i32.const 1152) "\00\00\00\00\00\00\00\00") ;; Local6 = 0
-  (data 0 (i32.const 1160) "\00\00\00\00\00\00\00\00") ;; Local7 = 0
-
-  ;; Offset 128...256 (rbx locals for now)
-  ;; then come the rbx locals (aaarghhh... it's the ugliest
-  ;; and most hardcoded stackframe you can think of)
-  (data 0 (i32.const 128) "\00\00\00\00\00\00\00\00") ;; Local 0
-  (data 0 (i32.const 104) "\00\00\00\00\00\00\00\00") ;; Local 1
-
-  ;; Offset 256...512 (rbx stack for now)
-  ;; then come the rbx stack (aaarghhh... it's the ugliest
-  (data 0 (i32.const 256) "\00\00\00\00\00\00\00\00") ;; slot 0
-  (data 0 (i32.const 264) "\00\00\00\00\00\00\00\00") ;; slot 1
-
+  (data 0 (i32.const 10100) "\00\00\00\00\00\00\00\00") ;; Local0 = 0
+  (data 0 (i32.const 10108) "\00\00\00\00\00\00\00\00") ;; Local1 = 0
+  (data 0 (i32.const 10116) "\00\00\00\00\00\00\00\00") ;; Local2 = 0
+  (data 0 (i32.const 10124) "\00\00\00\00\00\00\00\00") ;; Local3 = 0
+  (data 0 (i32.const 10132) "\00\00\00\00\00\00\00\00") ;; Local4 = 0
+  (data 0 (i32.const 10140) "\00\00\00\00\00\00\00\00") ;; Local5 = 0
+  (data 0 (i32.const 10148) "\00\00\00\00\00\00\00\00") ;; Local6 = 0
+  (data 0 (i32.const 10156) "\00\00\00\00\00\00\00\00") ;; Local7 = 0
 
   ;; module execution entry point
   (start $main)
 
   ;; ===================================================
-  ;; Register access functions
-
-  ;; compute reg address
-  (func $reg_addr (param $r i32) (result i32)
-    local.get $r
-    i32.const 8
-    i32.mul
-    i32.const 0 ;; register offset memory address
-    i32.load
-    i32.add
-  )
-
-  ;; set reg value
-  (func $reg_set (param $r i32) (param $val i64)
-    ;; compute memory-operand (register value x 8 bytes)
-    local.get $r
-    call $reg_addr
-    ;; push value
-    local.get $val
-    ;; store in register location
-    i64.store
-  )
-
-  ;; get reg value (= push it on stack)
-  (func $reg_get (param $r i32) (result i64)
-    ;; compute memory-operand (register value x 8 bytes)
-    local.get $r
-    call $reg_addr
-    ;; load from register location
-    i64.load
-  )
-
-  ;; ===================================================
-  ;; Stack access function
-
-  ;; get rbx local addr
-  (func $local_addr (param $l i32) (result i32)
-    local.get $l
-    i32.const 8
-    i32.mul
-    i32.const 4 ;; label offset memory address
-    i32.load
-    i32.add
-  )
-
-  (func $local_get (param $l i32) (result i64)
-    ;; compute memory-operand (register value x 8 bytes)
-    local.get $l
-    call $reg_addr
-    ;; load from register location
-    i64.load
-  )
-
-  ;; ===================================================
   ;; Instruction functions
   ;;
-  ;; $cf and $r? parameters ar i32 because they are passed as 
+  ;; $cf and $r? parameters are i32 because they are passed as 
   ;;  indices (eg. 1st call frame is 0, r0 is 0, r1 is 1,...)
   ;; $1, $2 params are 64 bits because they are Ruby values
   ;; (TODO: does this make sense ??)
@@ -183,7 +183,7 @@
   )
 
   ;; *** IMPORTANT NOTE ***
-  ;; Functions below must be declared int he exact same order as
+  ;; Functions below must be declared in the exact same order as
   ;; the Intruction Set above so that function index in the WASM
   ;; table match the index in the Instuction set array above
   (elem (i32.const 0) 
@@ -191,6 +191,100 @@
     $r_copy $r_load_1 $r_load_int $r_load_local
     $r_store_int $r_store_stack $ret
   )
+
+
+  ;; ===================================================
+  ;; Call Frame access functions
+  ;;
+
+  ;; >> Register access functions
+
+  ;; compute reg address
+  (func $reg_addr (param $cf i32) (param $r i32) (result i32)
+    local.get $cf
+    i32.const 8 ;; register offset memory address
+    i32.load
+    i32.add
+    local.get $r
+    i32.const 8 ;; registers are 8 bytes long
+    i32.mul
+    i32.add
+  )
+
+  ;; set reg value
+  (func $reg_set (param $cf i32) (param $r i32) (param $val i64)
+    ;; compute memory-operand (register value x 8 bytes)
+    local.get $cf
+    local.get $r
+    call $reg_addr
+    ;; push value
+    local.get $val
+    ;; store in register location
+    i64.store
+  )
+
+  ;; get reg value (= push it on stack)
+  (func $reg_get (param $cf i32) (param $r i32) (result i64)
+    ;; compute memory-operand (register value x 8 bytes)
+    local.get $cf
+    local.get $r
+    call $reg_addr
+    ;; load from register location
+    i64.load
+  )
+
+  ;; >> Locals access function
+
+  ;; get rbx local addr
+  (func $local_addr (param $cf i32) (param $l i32) (result i32)
+    local.get $cf
+    i32.const 12 ;; label offset memory address
+    i32.load
+    i32.add
+    local.get $l
+    i32.const 8
+    i32.mul
+    i32.add
+  )
+
+  (func $local_get (param $cf i32) (param $l i32) (result i64)
+    ;; compute local address
+    local.get $cf
+    local.get $l
+    call $local_addr
+    ;; load from local location
+    i64.load
+  )
+
+  ;; >> IP function
+
+  (func $ip_addr (param $cf i32) (result i32)
+    local.get $cf
+    i32.const 4 ;; ip offset memory address
+    i32.load
+    i32.add
+  )
+
+  ;; set ip value
+  (func $ip_set (param $cf i32) (param $val i64)
+    ;; compute ip address
+    local.get $cf
+    call $ip_addr
+    ;; push value
+    local.get $val
+    ;; store in ip location
+    i64.store
+  )
+
+  ;; get reg value (= push it on stack)
+  (func $ip_get (param $cf i32) (result i64)
+    ;; compute memory-operand (register value x 8 bytes)
+    local.get $cf
+    call $ip_addr
+    ;; load from register location
+    i64.load
+  )
+
 
   ;; NOTE : this is a nasty hard coded interpreter for fib
   ;; Of course this must become a true interpreter !!!
