@@ -85,7 +85,7 @@ end
 
 element_data << "(table #{names_subset.size} funcref)"
 element_data << '(elem (i32.const 0)'
-element_data << names_subset.map {|s| "$#{s}"}.join(', ')
+element_data << names_subset.map {|s| "$#{s}"}.join(' ')
 element_data << ')'
 
 puts %q{
