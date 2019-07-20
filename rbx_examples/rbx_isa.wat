@@ -2,10 +2,11 @@
   ;; This is the memory where we store interpreter
   ;; data like 1. The iseq; 2. The activation frame
   ;; For now we store registers 
-  (memory 0 1)
+  (memory 10)
 
   (global $TEXT (mut i32) (i32.const 8192))  ;; rbx program 
   (global $HEAP (mut i32) (i32.const 10024)) ;; heap base address
+  (global $OPCODE_BASE_ADDR (mut i32) (i32.const 2432)) ;; opcode names
 
   ;; For now we don't have all the interpreter machinery
   ;; implemented to allocate dynamically the call frame
@@ -19,7 +20,7 @@
   (data 0 (i32.const 0)  "\00\00\00\00")  ;; Previous CF offset
   (data 0 (i32.const 4)  "\04\00\00\00")  ;; IP offset (4)
   (data 0 (i32.const 8)  "\0C\00\00\00")  ;; Registers Offset (12)
-  (data 0 (i32.const 12) "\84\00\00\00")  ;; Locals Offset (76)
+  (data 0 (i32.const 12) "\4C\00\00\00")  ;; Locals Offset (76)
 
   ;; %% BEGINNING OF GENERATED INTRUCTION SET DATA %%
 
@@ -1423,6 +1424,8 @@ $call_send $call $call_0 $push_tagged_nil
 ;;  indices (eg. 1st call frame is 0, r0 is 0, r1 is 1,...)
 ;; $1, $2 params are 64 bits because they are Ruby values
 ;; (TODO: does this make sense ??)
+;;(type $TYPE_OPFUNC(func)) ;; Opcode functions retunr nothing
+
 (func $add_scope (param $cf i32) 
 )
 (func $allow_private (param $cf i32) 
@@ -1853,63 +1856,63 @@ $call_send $call $call_0 $push_tagged_nil
   (data 0 (i32.const 8216) "\02\00\00\00") ;;  6
   (data 0 (i32.const 8220) "\00\00\00\00") ;;  7
                                                 ;;    # n <= 1
-  (data 0 (i32.const 8192) "\94\00\00\00") ;;  8. n_ile r3, r2, r1
-  (data 0 (i32.const 8192) "\03\00\00\00") ;; 9
-  (data 0 (i32.const 8192) "\02\00\00\00") ;; 10
-  (data 0 (i32.const 8192) "\01\00\00\00") ;; 11
-  (data 0 (i32.const 8192) "\7E\00\00\00") ;; 12 b_if r3, done (ip = 49)
-  (data 0 (i32.const 8192) "\03\00\00\00") ;; 13
-  (data 0 (i32.const 8192) "\31\00\00\00") ;; 14
+  (data 0 (i32.const 8224) "\94\00\00\00") ;;  8. n_ile r3, r2, r1
+  (data 0 (i32.const 8228) "\03\00\00\00") ;; 9
+  (data 0 (i32.const 8232) "\02\00\00\00") ;; 10
+  (data 0 (i32.const 8236) "\01\00\00\00") ;; 11
+  (data 0 (i32.const 8240) "\7E\00\00\00") ;; 12 b_if r3, done (ip = 49)
+  (data 0 (i32.const 8244) "\03\00\00\00") ;; 13
+  (data 0 (i32.const 8248) "\31\00\00\00") ;; 14
                                                 ;;    # a = 1, r0
-  (data 0 (i32.const 8192) "\B8\00\00\00") ;; 15 r_load_1 r0
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 16.
+  (data 0 (i32.const 8252) "\B8\00\00\00") ;; 15 r_load_1 r0
+  (data 0 (i32.const 8256) "\00\00\00\00") ;; 16.
                                                 ;;    # b = 1, r3
-  (data 0 (i32.const 8192) "\B8\00\00\00") ;; 17. r_load_1 r3
-  (data 0 (i32.const 8192) "\03\00\00\00") ;; 18.
+  (data 0 (i32.const 8260) "\B8\00\00\00") ;; 17. r_load_1 r3
+  (data 0 (i32.const 8264) "\03\00\00\00") ;; 18.
                                                 ;;    # i = 2, r4
-  (data 0 (i32.const 8192) "\94\00\00\00") ;; 19. n_iadd r4, r0, r0
-  (data 0 (i32.const 8192) "\04\00\00\00") ;; 20
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 21
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 22
+  (data 0 (i32.const 8268) "\94\00\00\00") ;; 19. n_iadd r4, r0, r0
+  (data 0 (i32.const 8272) "\04\00\00\00") ;; 20
+  (data 0 (i32.const 8276) "\00\00\00\00") ;; 21
+  (data 0 (i32.const 8280) "\00\00\00\00") ;; 22
                                                 ;;    top.set!
                                                 ;;    # i < n, r4 < r2
-  (data 0 (i32.const 8192) "\96\00\00\00") ;; 23. n_ige r5, r4, r2
-  (data 0 (i32.const 8192) "\05\00\00\00") ;; 24
-  (data 0 (i32.const 8192) "\04\00\00\00") ;; 25
-  (data 0 (i32.const 8192) "\02\00\00\00") ;; 26
-  (data 0 (i32.const 8192) "\7E\00\00\00") ;; 27. b_if r5, int (ip = 46)
-  (data 0 (i32.const 8192) "\05\00\00\00") ;; 28
-  (data 0 (i32.const 8192) "\2E\00\00\00") ;; 29
+  (data 0 (i32.const 8284) "\96\00\00\00") ;; 23. n_ige r5, r4, r2
+  (data 0 (i32.const 8288) "\05\00\00\00") ;; 24
+  (data 0 (i32.const 8292) "\04\00\00\00") ;; 25
+  (data 0 (i32.const 8296) "\02\00\00\00") ;; 26
+  (data 0 (i32.const 8300) "\7E\00\00\00") ;; 27. b_if r5, int (ip = 46)
+  (data 0 (i32.const 8304) "\05\00\00\00") ;; 28
+  (data 0 (i32.const 8308) "\2E\00\00\00") ;; 29
                                                 ;;    body.set!
                                                 ;;    # t = a, r6
-  (data 0 (i32.const 8192) "\88\00\00\00") ;; 30. r_copy r6, r0
-  (data 0 (i32.const 8192) "\06\00\00\00") ;; 31
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 32
+  (data 0 (i32.const 8312) "\88\00\00\00") ;; 30. r_copy r6, r0
+  (data 0 (i32.const 8316) "\06\00\00\00") ;; 31
+  (data 0 (i32.const 8320) "\00\00\00\00") ;; 32
                                                 ;;    # a += b
-  (data 0 (i32.const 8192) "\94\00\00\00") ;; 33. n_iadd r0, r0, r3
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 34
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 35
-  (data 0 (i32.const 8192) "\03\00\00\00") ;; 36
+  (data 0 (i32.const 8324) "\94\00\00\00") ;; 33. n_iadd r0, r0, r3
+  (data 0 (i32.const 8328) "\00\00\00\00") ;; 34
+  (data 0 (i32.const 8332) "\00\00\00\00") ;; 35
+  (data 0 (i32.const 8336) "\03\00\00\00") ;; 36
                                                 ;;    # b = t
-  (data 0 (i32.const 8192) "\88\00\00\00") ;; 37. r_copy r3, r6
-  (data 0 (i32.const 8192) "\03\00\00\00") ;; 38
-  (data 0 (i32.const 8192) "\06\00\00\00") ;; 39
+  (data 0 (i32.const 8340) "\88\00\00\00") ;; 37. r_copy r3, r6
+  (data 0 (i32.const 8344) "\03\00\00\00") ;; 38
+  (data 0 (i32.const 8348) "\06\00\00\00") ;; 39
                                                 ;;    # i += 1
-  (data 0 (i32.const 8192) "\94\00\00\00") ;; 40. n_iadd r4, r4, r1
-  (data 0 (i32.const 8192) "\04\00\00\00") ;; 41
-  (data 0 (i32.const 8192) "\04\00\00\00") ;; 42
-  (data 0 (i32.const 8192) "\01\00\00\00") ;; 43
+  (data 0 (i32.const 8352) "\94\00\00\00") ;; 40. n_iadd r4, r4, r1
+  (data 0 (i32.const 8356) "\04\00\00\00") ;; 41
+  (data 0 (i32.const 8360) "\04\00\00\00") ;; 42
+  (data 0 (i32.const 8364) "\01\00\00\00") ;; 43
                                                 ;;    # loop
-  (data 0 (i32.const 8192) "\B5\00\00\00") ;; 44. goto_past top (ip = 23)
-  (data 0 (i32.const 8192) "\17\00\00\00") ;; 45.  
+  (data 0 (i32.const 8368) "\B5\00\00\00") ;; 44. goto_past top (ip = 23)
+  (data 0 (i32.const 8372) "\17\00\00\00") ;; 45.  
                                                 ;;    int.set!
-  (data 0 (i32.const 8192) "\87\00\00\00") ;; 46. r_store_int r0, r0
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 47
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 48
+  (data 0 (i32.const 8376) "\87\00\00\00") ;; 46. r_store_int r0, r0
+  (data 0 (i32.const 8380) "\00\00\00\00") ;; 47
+  (data 0 (i32.const 8384) "\00\00\00\00") ;; 48
                                                 ;;    done.set!
-  (data 0 (i32.const 8192) "\84\00\00\00") ;; 49. r_store_stack r0
-  (data 0 (i32.const 8192) "\00\00\00\00") ;; 50
-  (data 0 (i32.const 8192) "\46\00\00\00") ;; 51. ret
+  (data 0 (i32.const 8388) "\84\00\00\00") ;; 49. r_store_stack r0
+  (data 0 (i32.const 8392) "\00\00\00\00") ;; 50
+  (data 0 (i32.const 8396) "\46\00\00\00") ;; 51. ret
 
 
   ;; This is where heap base starts
@@ -2017,15 +2020,18 @@ $call_send $call $call_0 $push_tagged_nil
   )
 
   ;; >> IP function
+  ;; Note: IP value is not a absolute address in WASM memory
+  ;; but an offset relative to the beginning of the current 
+  ;; rbx bytecode section being executed
 
+  ;; Address of current ip field in WASM memory
   (func $ip_addr (param $cf i32) (result i32)
     local.get $cf
-    i32.const 4 ;; ip offset memory address
-    i32.load
+    i32.const 4 
     i32.add
   )
 
-  ;; set ip value
+  ;; set current ip value
   ;; ip = val
   (func $ip_set (param $cf i32) (param $val i32)
     ;; compute ip address
@@ -2037,12 +2043,12 @@ $call_send $call $call_0 $push_tagged_nil
     i32.store
   )
 
-  ;; get reg value (= push it on stack)
+  ;; get current ip value (= push it on stack)
   (func $ip_get (param $cf i32) (result i32)
-    ;; compute memory-operand (register value x 8 bytes)
+    ;; compute the address of IP in current call frame
     local.get $cf
     call $ip_addr
-    ;; load from register location
+    ;; load IP value
     i32.load
   )
 
@@ -2060,43 +2066,175 @@ $call_send $call $call_0 $push_tagged_nil
     call $ip_set
   )
 
+  ;; get bytecode value at ip offset
+  ;; (this is to read opcodes and argument values from byte code)
+  ;; offset 0 = opcode
+  ;;        1 = first argument
+  ;;        2 = second argument
+  ;;        ....
+  (func $ip_get_bytecode (param $cf i32) (param $offset i32) (result i32)
+    ;; TODO : WARNING text is taken as the base address to
+    ;; compute the bytecode address in WASM memory but
+    ;; this only works bcause we have a single function right now
+    (i32.load 
+      (i32.add 
+        (global.get $TEXT)
+        ;; get ip location
+        (i32.add
+          (call $ip_get (local.get $cf))
+          (i32.mul (local.get $offset) (i32.const 4))
+        )
+      )
+    )
+  ) 
+
+  ;; >> OPCODE attribute access function
+
+  ;; opcode address in memory
+  (func $opcode_addr (param $id i32) (result i32)
+    ;; compute opcode offset (= id * 20 bytes)
+    local.get $id
+    i32.const 20 ;; size in bytes of opcode attr 
+    i32.mul
+    ;; add to opcode attribute array base address
+    global.get $OPCODE_BASE_ADDR
+    i32.add
+  )
+
+  ;; opcode name
+  (func $opcode_name (param $id i32) (result i32)
+    local.get $id
+    call $opcode_addr
+  )
+
+  ;; opcode size in memory
+  (func $opcode_size (param $id i32) (result i32)
+    local.get $id
+    call $opcode_addr
+    i32.const 4
+    i32.add
+    i32.load
+  )
+
+  ;; opcode id 
+  (func $opcode_id (param $id i32) (result i32)
+    ;; TODO Sanity check : make param id == id from the opcode id attribute
+    local.get $id
+    call $opcode_addr
+    i32.const 8
+    i32.add
+    i32.load
+  ) 
+
+  ;; opcode number of arguments
+  (func $opcode_arg_count (param $id i32) (result i32)
+    local.get $id
+    call $opcode_addr
+    i32.const 12
+    i32.add
+    i32.load
+  )
+
+  ;; opcode function index
+  (func $opcode_func (param $id i32) (result i32)
+    local.get $id
+    call $opcode_addr
+    i32.const 16
+    i32.add
+    i32.load
+  )
+
+
   ;; NOTE : this is a nasty hardcoded interpreter for fib
   ;; Of course this must become a true interpreter !!!
   ;; But let's make baby steps
   ;;
   ;; $0 is passed as an argument to the rbx application
   (func $interpret (param $0 i64) (result i64)
+    (local $cf i32)
+    (local $id i32)
+    (local $arg_count i32)
+    (local $i i32)
+
+    ;; set initial call frame address (= HEAP base addr
+    global.get $HEAP
+    local.set $cf
 
     ;; initialize local 0 in call frame with Fibonacci value n
-    global.get $HEAP ;; bottom call frame pointer ($cf)
-    i32.const 0 ;; local 0
-    local.get $0 ;; value
-    call $local_set
-    
-    ;; initialize IP
-    global.get $HEAP ;; $cf
-    i32.const 0      ;; first instruction
-    call $ip_set
-    
-    (loop $iseq
-      ;; fetch opcode
-
-      ;; fetch number of arguments
-
-      ;; push arguments on WASM stack
-
-      ;; call opcode function
-      global.get $HEAP ;; bottom call frame pointer ($cf)
-
-    
+    (call $local_set
+      (local.get $cf) ;; bottom call frame pointer ($cf)
+      (i32.const 0) ;; local 0
+      (local.get $0) ;; value
     )
+    
+    ;; initialize IP to first instruction (ip = 0)
+    (call $ip_set
+      (local.get $cf) ;; bottom call frame pointer ($cf)
+      (i32.const 0)
+    )
+    
+    block $interp_block
+    loop $insn_loop
+      ;; fetch opcode id at current ip
+      (call $ip_get_bytecode
+        (local.get $cf)
+        (i32.const 0)
+      )
+      local.set $id
+
+      ;; fetch number of arguments (n) for this opcode id
+      (call $opcode_arg_count (local.get $id))
+      local.set $arg_count
+      i32.const 0
+      local.set $i
+
+      ;; push n arguments on WASM stack
+      loop $arg_loop
+        ;; break if arg count reached
+        (br_if $insn_loop 
+          (i32.eq (local.get $i) (local.get $arg_count))
+        )
+
+        ;; increment arg counter
+        (i32.add (local.get $i) (i32.const 1))
+        local.set $i
+
+        ;; push rbx arg on stack
+        (call $ip_get_bytecode
+          (local.get $cf)
+          (local.get $i)
+        )
+        
+        br $arg_loop
+      end
+
+      ;; call opcode function indirectly
+      ;; with arguments on stack
+      local.get $id
+      call_indirect
+
+      ;; stop interpreting if opocde is 'ret'
+      ;; TODO: refine halt condition
+      (br_if $interp_block
+        (i32.eq (local.get $id) (i32.const 70))
+      )
+    end
+    end
+    
+    ;; return value from top of rbx stack
+    ;; TODO: return fake i64 for now
+    i64.const 0
   )
 
   ;; Invoke the fib method
   ;; fib(5)
-  (func $main (result i64)
+  (func $main
     i64.const 5
     call $interpret
+    ;; drop rbx value returned by interpretet
+    ;; to avoid error "type mismatch in implicit return, expected [i64] but got []"
+    ;; TODO: see if this is normal
+    drop 
   )
 
 )
