@@ -1,0 +1,23 @@
+<!doctype html>
+
+<html>
+<head>
+  <script>
+    // Load the module using the newest Streaming API
+    WebAssembly.instantiateStreaming(fetch('rbx_isa.wasm'))
+    .then(obj => {
+        //var exports = obj.instance.exports; // the exports of that instance
+        //var xor = exports._xor; // Rename _xor to xor 🙂
+        // Add a listener to the button so we can execute the main function when the button is pressed.
+        var button = document.getElementById('run');
+        button.addEventListener('click', function() {
+          console.log(obj.instance.exports.main(5));
+        }, false);
+      }
+    );
+  </script>
+</head>
+<body>
+  <input type="button" id="run" value="click to run rbx wasm VM"/>
+</body>
+</html>

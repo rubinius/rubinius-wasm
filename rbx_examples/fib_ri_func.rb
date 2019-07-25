@@ -111,9 +111,12 @@ class A
     top.set!
 
     # i < n, r4 < r2
-    g.n_ilt r5, r4, r2
-    g.b_if r5, body
-    g.goto int
+    # g.n_ilt r5, r4, r2
+    # g.b_if r5, body
+    # g.goto int
+
+    g.n_ige r5, r4, r2
+    g.b_if r5, int
 
     body.set!
 
@@ -146,9 +149,9 @@ end
 define_method(:fib, &A.new.method(:fib))
 define_method(:fibi, &A.new.method(:fibi))
 
-p fib(30), fibi(30)
+p fib(40), fibi(40)
 
 Benchmark.ips do |x|
-  x.report 'fib(30)', %{ fib(30) }
-  x.report 'fibi(30)', %{ fibi(30) }
+  x.report 'fib(40)', %{ fib(40) }
+  x.report 'fibi(40)', %{ fibi(40) }
 end

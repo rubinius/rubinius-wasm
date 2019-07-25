@@ -43,7 +43,8 @@ load '/tmp/opcodes.rb'
 MEMORY_BASE = 64
 NAME_TMPL = '(data 0 (i32.const %s) "%s\00")'
 INSN_TMPL = '(data 0 (i32.const %d) "%s") ;; %d'
-FUNC_TMPL = %q{(func %s (param $cf i32) %s
+FUNC_TMPL = %q{(func %s (param $state i32) (param $cf i32) (param $opcodes i32)
+  (call $not_implemented)
 )}
 
 class Integer
@@ -93,15 +94,16 @@ names_subset.each_with_index do |name, idx|
   size = arg_count + 1
   func_idx = idx
 
-  instruction_data << ";; #{insn.name}"
+  function_comment = ";; #{insn.name} #{insn.args.join(', ')}"
+  instruction_data << function_comment
   [name_addr, size, id, arg_count, func_idx].each do |v|
-   instruction_data << sprintf(INSN_TMPL, addr, v.to_little_endian(4), v)
-   addr += 4
+    instruction_data << sprintf(INSN_TMPL, addr, v.to_little_endian(4), v)
+    addr += 4
   end
 
   # generate function prototype
-  wasm_args = insn.args.map {|arg| "(param $#{arg} i32)" }.join(' ')
-  function_data << sprintf(FUNC_TMPL, "$#{name}", wasm_args)
+  function_data << function_comment
+  function_data << sprintf(FUNC_TMPL, "$#{name}")
 
 end
 
