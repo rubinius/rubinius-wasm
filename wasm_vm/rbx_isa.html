@@ -3,21 +3,37 @@
 <html>
 <head>
   <script>
+    var importObject = {
+      host: {
+        print: function(arg) {
+          console.log(arg);
+        }
+      }
+    };
     // Load the module using the newest Streaming API
-    WebAssembly.instantiateStreaming(fetch('rbx_isa.wasm'))
+    WebAssembly.instantiateStreaming(fetch('rbx_isa.wasm'), importObject)
     .then(obj => {
-        //var exports = obj.instance.exports; // the exports of that instance
-        //var xor = exports._xor; // Rename _xor to xor 🙂
-        // Add a listener to the button so we can execute the main function when the button is pressed.
+        // Add a listener to the button so we can execute the 
+        // main_js function when the button is pressed.
         var button = document.getElementById('run');
         button.addEventListener('click', function() {
-          console.log(obj.instance.exports.main(5));
+          var n = +document.getElementById('n').value;
+          console.log(n);
+          var fib_n = obj.instance.exports.main_js(n);
+          console.log(fib_n);
+          document.getElementById('fib_n').innerHTML = fib_n;
+          //console.log(obj.instance.exports.main_js(16));
         }, false);
       }
     );
   </script>
 </head>
 <body>
-  <input type="button" id="run" value="click to run rbx wasm VM"/>
+  <h1>Rubinius WASM VM test</h1>
+
+  <p>Fibonacci terms</p>
+  n = <input type="text" size=6 id="n" value=16>
+  <input type="button" id="run" value="Run"/>
+  <p id="fib_n">-</p>
 </body>
 </html>

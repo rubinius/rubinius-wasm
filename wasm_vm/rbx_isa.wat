@@ -1,4 +1,8 @@
 (module $rbx_wasm
+  ;; log function
+  (import "host" "print" (func $log_i64 (param i64)))
+  (import "host" "print" (func $log_3i32_8i64 (param i32 i32 i32 i64 i64 i64 i64 i64 i64 i64 i64)))
+
   ;; This is the memory where we store interpreter
   ;; data like 1. The iseq; 2. The activation frame
   ;; For now we store registers 
@@ -6,7 +10,8 @@
 
   (global $OPCODES (mut i32) (i32.const 8192))  ;; rbx program 
   (global $HEAP (mut i32) (i32.const 10024)) ;; heap base address (call frames)
-  (global $INSTRUCTIONS (mut i32) (i32.const 2432)) ;;instruxtions definition
+  (global $INSTRUCTIONS (mut i32) (i32.const 2432)) ;;instructions definition
+  (global $DEBUG (mut i32) (i32.const 0)) ;; debug flag (1=true, 0=false)
 
   ;; For now we don't have all the interpreter machinery
   ;; implemented to allocate dynamically the call frame
@@ -19,8 +24,9 @@
   ;; Offsets below are relative to the Call Frame structure
   (data 0 (i32.const 0)  "\00\00\00\00")  ;; Previous CF offset
   (data 0 (i32.const 4)  "\04\00\00\00")  ;; IP offset (4)
-  (data 0 (i32.const 8)  "\0C\00\00\00")  ;; Registers Offset (12)
-  (data 0 (i32.const 12) "\4C\00\00\00")  ;; Locals Offset (76)
+  (data 0 (i32.const 8)  "\08\00\00\00")  ;; Stack ptr offset (8)
+  (data 0 (i32.const 12) "\0C\00\00\00")  ;; Registers Offset (12)
+  (data 0 (i32.const 16) "\4C\00\00\00")  ;; Locals Offset (76)
 
   ;; %% BEGINNING OF GENERATED INTRUCTION SET DATA %%
 
@@ -1689,7 +1695,11 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
 )
 ;; ret index
 (func $ret (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $not_implemented)
+  ;; TODO: implement some more stack management logic as in
+  ;; and also see how to return the stack top value as instruction function
+  ;; type doesn't allow a (result i32) - see type $insn_t
+  ;; https://github.com/rubinius/rubinius/blob/36e2be5ee5a06dbd788870e3692b397abdc9f4f3/machine/instructions/ret.hpp
+  (drop (call $stack_top (local.get $cf)))
 )
 ;; rotate count
 (func $rotate (param $state i32) (param $cf i32) (param $opcodes i32)
@@ -1963,7 +1973,16 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
 )
 ;; r_store_stack r0
 (func $r_store_stack (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $not_implemented)
+  ;; TODO: check if we need to implement the RVAL logic as in
+  ;; https://github.com/rubinius/rubinius/blob/36e2be5ee5a06dbd788870e3692b397abdc9f4f3/machine/instructions/r_store_stack.hpp
+  (call $stack_push 
+    (local.get $cf)
+    (call $reg_get 
+      (local.get $cf) 
+      (call $ip_get_arg_1 (local.get $cf))
+    )
+  )
+  (call $ip_next (local.get $cf))
 )
 ;; r_load_literal r0, literal
 (func $r_load_literal (param $state i32) (param $cf i32) (param $opcodes i32)
@@ -1971,7 +1990,7 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
 )
 ;; r_load_int r0, r1
 (func $r_load_int (param $state i32) (param $cf i32) (param $opcodes i32)
-  ;; TODO: must be modified to cast r1 to fixnum_p() 
+  ;; TODO: must be modified to include the fixnum logic 
   ;; (see https://github.com/rubinius/rubinius/blob/master/machine/instructions/r_load_int.hpp)
   (call $reg_set
     (local.get $cf)
@@ -1985,7 +2004,18 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
 )
 ;; r_store_int r0, r1
 (func $r_store_int (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $not_implemented)
+  ;; TODO: must be modified to include the fixnum/bignum logic
+  ;; (https://github.com/rubinius/rubinius/blob/master/machine/instructions/r_store_int.hpp)
+  ;; For now let's just assume it's WASM int
+  (call $reg_set
+    (local.get $cf)
+    (call $ip_get_arg_1 (local.get $cf))
+    (call $reg_get 
+      (local.get $cf) 
+      (call $ip_get_arg_2 (local.get $cf))
+    )
+  )
+  (call $ip_next (local.get $cf))
 )
 ;; r_copy r0, r1
 (func $r_copy (param $state i32) (param $cf i32) (param $opcodes i32)
@@ -2357,7 +2387,7 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
   (data 0 (i32.const 8344) "\03\00\00\00") ;; 38
   (data 0 (i32.const 8348) "\06\00\00\00") ;; 39
                                                 ;;    # i += 1
-  (data 0 (i32.const 8352) "\94\00\00\00") ;; 40. n_iadd r4, r4, r1
+  (data 0 (i32.const 8352) "\89\00\00\00") ;; 40. n_iadd r4, r4, r1
   (data 0 (i32.const 8356) "\04\00\00\00") ;; 41
   (data 0 (i32.const 8360) "\04\00\00\00") ;; 42
   (data 0 (i32.const 8364) "\01\00\00\00") ;; 43
@@ -2371,7 +2401,8 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
                                                 ;;    done.set!
   (data 0 (i32.const 8388) "\84\00\00\00") ;; 49. r_store_stack r0
   (data 0 (i32.const 8392) "\00\00\00\00") ;; 50
-  (data 0 (i32.const 8396) "\46\00\00\00") ;; 51. ret
+  (data 0 (i32.const 8396) "\46\00\00\00") ;; 51. ret 0
+  (data 0 (i32.const 8400) "\00\00\00\00") ;; 52
 
 
   ;; This is where heap base starts
@@ -2381,7 +2412,9 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
   ;; Call Frame 0 (IP + 8 registers + 8 locals)
   (data 0 (i32.const 10024) "\00\00\00\00") ;; Previous CF address (0x00000000 means bottom CF)
   (data 0 (i32.const 10028) "\00\00\00\00") ;; IP
-  ;;
+  (data 0 (i32.const 10032) "\08\29\00\00") ;; stack ptr(= 10512 - 8)
+
+  ;; registers
   (data 0 (i32.const 10036) "\00\00\00\00\00\00\00\00") ;; R0 = 0
   (data 0 (i32.const 10044) "\00\00\00\00\00\00\00\00") ;; R1 = 0
   (data 0 (i32.const 10052) "\00\00\00\00\00\00\00\00") ;; R2 = 0
@@ -2390,7 +2423,7 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
   (data 0 (i32.const 10076) "\00\00\00\00\00\00\00\00") ;; R5 = 0
   (data 0 (i32.const 10084) "\00\00\00\00\00\00\00\00") ;; R6 = 0
   (data 0 (i32.const 10092) "\00\00\00\00\00\00\00\00") ;; R7 = 0
-  ;;
+  ;; locals
   (data 0 (i32.const 10100) "\00\00\00\00\00\00\00\00") ;; Local0 = 0
   (data 0 (i32.const 10108) "\00\00\00\00\00\00\00\00") ;; Local1 = 0
   (data 0 (i32.const 10116) "\00\00\00\00\00\00\00\00") ;; Local2 = 0
@@ -2399,20 +2432,25 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
   (data 0 (i32.const 10140) "\00\00\00\00\00\00\00\00") ;; Local5 = 0
   (data 0 (i32.const 10148) "\00\00\00\00\00\00\00\00") ;; Local6 = 0
   (data 0 (i32.const 10156) "\00\00\00\00\00\00\00\00") ;; Local7 = 0
+  ;; stack
+  (data 0 (i32.const 10512) "\00\00\00\00\00\00\00\00") ;; stack slot #1
+  (data 0 (i32.const 10516) "\00\00\00\00\00\00\00\00") ;; stack slot #2
+  ;; .... and so on
 
   ;; module execution entry point
   ;;(start $main)
 
   ;; ===================================================
   ;; Call Frame access functions
-  ;;
+  ;; ===================================================
 
-  ;; >> Register access functions
+  ;; -----------------------------------------------
+  ;; >>>>>>>    Register access functions
 
   ;; compute reg address
   (func $reg_addr (param $cf i32) (param $r i32) (result i32)
     local.get $cf
-    i32.const 8 ;; register offset memory address
+    i32.const 12 ;; register offset memory address
     i32.load
     i32.add
     local.get $r
@@ -2443,12 +2481,13 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
     i64.load
   )
 
-  ;; >> Locals access function
+  ;; -----------------------------------------------
+  ;; >>>>>>>   Locals access function
 
   ;; get rbx local addr
   (func $local_addr (param $cf i32) (param $l i32) (result i32)
     local.get $cf
-    i32.const 12 ;; label offset memory address
+    i32.const 16 ;; label offset memory address
     i32.load
     i32.add
     local.get $l
@@ -2478,7 +2517,8 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
     i64.load
   )
 
-  ;; >> IP function
+  ;; -----------------------------------------------
+  ;; >>>>>>>   IP function
   ;; Note: IP value is not a absolute address in WASM memory
   ;; but an offset relative to the beginning of the current 
   ;; rbx bytecode section being executed
@@ -2586,7 +2626,8 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
     (call $ip_get_arg (local.get $cf) (i32.const 3))
   )
 
-  ;; >> OPCODE attribute access function
+  ;; -----------------------------------------------
+  ;; >>>>>>>   Instructions attribute access function
 
   ;; insn opcode address in memory
   (func $insn_ptr (param $opcode i32) (result i32)
@@ -2642,15 +2683,79 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
     i32.load
   )
 
-  ;; >> Misc. functions
+  ;; -----------------------------------------------
+  ;; >>>>>>>  Stack functions
+
+  (func $stack_addr (param $cf i32) (result i32)
+    (i32.add
+      (local.get $cf)
+      (i32.const 8) ;; stack offset in call frame
+    )
+  )
+
+  (func $stack_ptr_get (param $cf i32) (result i32)
+    (i32.load (call $stack_addr (local.get $cf)))
+  )
+
+  (func $stack_ptr_set (param $cf i32) (param $address i32)
+    (i32.store
+      (call $stack_addr (local.get $cf))
+      (local.get $address)
+    )
+  )
+
+  (func $stack_ptr_incr (param $cf i32)
+    (call $stack_ptr_set
+      (local.get $cf)
+      (i32.add 
+        (call $stack_ptr_get (local.get $cf))
+        (i32.const 8) ;; All objects ptr on stack are 8 bytes long
+      )
+    )
+  )
+
+  (func $stack_push (param $cf i32) (param $value i64)
+    (call $stack_ptr_incr (local.get $cf))
+    (i64.store
+      (call $stack_ptr_get (local.get $cf))
+      (local.get $value)
+    )
+  )
+
+  (func $stack_top (param $cf i32) (result i32)
+    (call $stack_ptr_get (local.get $cf))
+  )
+
+  ;; -----------------------------------------------
+  ;; >>>>>>>   Misc. functions
   
+  ;; Raise exception
+  ;; invoked from rbx instructions not yet implemente
+  ;; TODO: is there any other way of raising an exception?
   (func $not_implemented
-    ;; TODO: this is the only way I found so far to raise
-    ;; an exception :-(
     (drop (i32.div_u (i32.const 1) (i32.const 0)))
   )
 
-
+  ;; Log call stack (IP, opcode and registers
+  ;; make sure to use  wasm-interp --host-print
+  (func $log_cf (param $cf i32)
+    (if (i32.eqz (global.get $DEBUG))
+      (then (return))
+    )
+    (call $log_3i32_8i64
+      (call $ip_get (local.get $cf)) ;; IP
+      (call $stack_ptr_get (local.get $cf)) ;; stack ptr
+      (call $ip_get_opcode (local.get $cf)) ;; opcode
+      (call $reg_get (local.get $cf) (i32.const 0)) ;; R0
+      (call $reg_get (local.get $cf) (i32.const 1)) ;; R1
+      (call $reg_get (local.get $cf) (i32.const 2)) ;; R2
+      (call $reg_get (local.get $cf) (i32.const 3)) ;; R3
+      (call $reg_get (local.get $cf) (i32.const 4)) ;; R4
+      (call $reg_get (local.get $cf) (i32.const 5)) ;; R5
+      (call $reg_get (local.get $cf) (i32.const 6)) ;; R6
+      (call $reg_get (local.get $cf) (i32.const 7)) ;; R7
+    )
+  )
 
   ;; NOTE : this is a nasty hardcoded interpreter for fib
   ;; Of course this must become a true interpreter !!!
@@ -2697,36 +2802,54 @@ $add_scope $allow_private $cast_array $cast_for_multi_block_arg $cast_for_single
         )
         
         ;; call insn function indirectly
-        ;; with the arguments on stack
-        local.get $state
-        local.get $cf
-        local.get $opcodes
-        (call_indirect (type $insn_t) (local.get $opcode) )
+        (call $log_cf (local.get $cf)) ;; DEBUG msg
+        (call_indirect (type $insn_t) 
+          (local.get $state) 
+          (local.get $cf) 
+          (local.get $opcodes) 
+          (local.get $opcode) ;; instruction function pointer
+        )
 
         ;; stop interpreting if opocde is 'ret'
         ;; TODO: must refine halt condition
-        (br_if $interp_block
+        (if
           (i32.eq (local.get $opcode) (i32.const 70))
+          (then (br $interp_block))
+          (else (br $insn_loop))
         )
-        (br $insn_loop)
       end
     end
     
     ;; return value from top of rbx stack
-    ;; TODO: return fake i64 for now
-    i64.const 0
+    ;; (note: the pointer to top of the stack pointer in
+    ;; WASM memory has already been pushed on the WASM
+    ;; stack by the last rbx 'ret' instruction but for now
+    ;; the $insn_t type doesn't allo a return value so it 
+    ;; simply discarded :-(
+    ;; TODO: probably need to refine that in the future
+    (i64.load (call $stack_top (local.get $cf)))
   )
 
-  ;; Invoke the fib method
+  ;; Invoke the fib method from Web browser
   ;; fib(5)
   ;; NOTE: JS doesn't handle i64 type for now. So
   ;; cast i32 to i64 back and forth for now
   ;;(func $main (param $arg i32) (result i32)
-  (func $main (param $arg i32) (result i32)
+  (func $main_js (param $arg i32) (result i32)
     ;; compute fib(5)
     (i32.wrap_i64 
       (call $interpret (i64.extend_i32_s (local.get $arg)))
     )
   )
-  (export "main" (func $main))
+  (export "main_js" (func $main_js))
+
+  ;; Invoke the fib method from wasm-interp command line
+  ;; WASM start entry point cannot accept argument
+  ;; or return any value
+  (func $main
+    ;; compute fib(5)
+    (call $log_i64
+      (call $interpret (i64.const 16))
+    )
+  )
 )
