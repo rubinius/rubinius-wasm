@@ -1,0 +1,17 @@
+;; Rubinius WebAssembly VM
+;; Copyright (c) 2019, Laurent Julliard and contributors
+;; All rights reserved.
+
+(module $rbx_wasm_vm
+
+ <%= render 'import.wat' %>
+ <%= render 'memory.wat' %>
+ <%= render 'global.wat' %>
+ <%= render 'data.wat' %>
+ <%= render 'instructions.wat' %>
+ <%= render 'call_frame.wat' %>
+ <%= render 'log.wat' %>
+ <%= render 'interpreter.wat' %>
+ <%= render 'main.wat' %>
+ 
+)
