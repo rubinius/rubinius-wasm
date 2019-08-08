@@ -3,9 +3,7 @@
   ;; implemented to allocate dynamically the call frame
   ;; etc... so let's do it by hand. VERY UGLY but it's a start
 
-  ;; Memory 0 to 64: (16 x 4 bytes for now to store some hardcoded offsets)
-  ;; we use 32 bits offset here because wasm memory segment are 2^32 bytes
-  ;; max as far as I understand
+  ;; Memory 0 to 64: store static dat
   ;;
   ;; Offsets below are relative to the Call Frame structure
   (data 0 (i32.const 0)  "\00\00\00\00")  ;; Previous CF offset
@@ -13,6 +11,10 @@
   (data 0 (i32.const 8)  "\08\00\00\00")  ;; Stack ptr offset (8)
   (data 0 (i32.const 12) "\0C\00\00\00")  ;; Registers Offset (12)
   (data 0 (i32.const 16) "\4C\00\00\00")  ;; Locals Offset (76)
+  ;; Malloc static data (see malloc.wat)
+  (data 0 (i32.const 20) "\00\00\00\00")  ;; base header for free empty list (ptr)
+  (data 0 (i32.const 24) "\00\00\00\00")  ;; base header for free empty list (size) 
+  (data 0 (i32.const 28) "\00\00\00\00")  ;; Malloc free list pointer (Header *freep)
 
   ;; %% BEGINNING OF GENERATED INTRUCTION SET DATA %%
 
