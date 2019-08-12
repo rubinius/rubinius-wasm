@@ -1,3 +1,16 @@
-# ignore build directory
-build/
-scratchpad/
+Gemfile.lock
+# ignore build directory 
+/build
+
+# ignore scratchpad directory
+/scratchpad
+
+# ignore typical Ruby gem file
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/

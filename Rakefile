@@ -2,6 +2,8 @@
 # Copyright (c) 2019, Laurent Julliard and contributors
 # All rights reserved.
 
+#require "bundler/gem_tasks" # we are not building a gem right now
+require "rake/testtask"
 require 'erb'
 require 'fileutils'
 
@@ -21,8 +23,8 @@ end
 
 desc 'Assemble WAT files'
 task :assemble => [:create_build_dir] do
-  template = ERB.new(File.open(ERB_FILE,'r').read)
-  File.open(WAT_VM_FILE,'w') { |fh| fh.write(template.result(binding))}
+  renderer = ERB.new(File.open(ERB_FILE,'r').read)
+  File.open(WAT_VM_FILE,'w') { |fh| fh.write(renderer.result(binding))}
 end
 
 desc 'Compile VM WAT file to WASM'
@@ -49,3 +51,11 @@ task :create_build_dir do
   FileUtils.mkdir_p(File.join('./build', 'src'))
   FileUtils.mkdir_p(File.join('./build', 'bin'))
 end
+
+Rake::TestTask.new(:test) do |t|
+  t.libs << "test"
+  t.libs << "lib"
+  t.test_files = FileList["test/**/*_test.rb"]
+end
+
+task :default => :test

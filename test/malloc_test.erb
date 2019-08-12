@@ -1,0 +1,36 @@
+;; Rubinius WebAssembly VM
+;; Copyright (c) 2019, Laurent Julliard and contributors
+;; All rights reserved.
+
+(module $malloc_test
+
+  (export "memory" (memory $0))
+
+  <% ['malloc', 'free', 'morecore', 'sbrk', 'get_freep', 'set_freep',
+      'set_hdr_ptr', 'get_hdr_ptr', 'set_hdr_size', 'get_hdr_size'].each do |f| %>
+    (export "<%= f %>" (func $<%= f %>))
+  <% end %>
+
+  ;; use a smaller memory for the test
+  <%# render 'memory.wat' %>
+  (memory $0 1)
+
+  <%= render 'global.wat' %>
+  <%= render 'data.wat' %>
+  <%= render 'malloc.wat' %>
+
+  ;; wasmer API doesn't handle function with no return value :-(
+  (func $proxy_set_freep (param $ptr i32) (result i32)
+    (call $set_freep (local.get $ptr))
+    (i32.const 0)
+  )
+  (export "proxy_set_freep" (func $proxy_set_freep))
+
+  ;; wasmer ruby est doesn't have the memory.size entry point
+  (func $memory_size (result i32)
+    (return (memory.size))
+  )
+  (export "memory_size" (func $memory_size))
+
+
+)
