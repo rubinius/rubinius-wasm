@@ -1,3 +1,8 @@
+;; Rubinius WebAssembly VM
+;; Copyright (c) 2019, Laurent Julliard and contributors
+;; All rights reserved.
+
+
 ;; *** IMPORTANT NOTE ***
 ;; Functions below must be declared in the exact same order as
 ;; the Intruction Set above so that function index in the WASM
@@ -37,13 +42,12 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 
 ;; Raise exception
 ;; invoked from rbx instructions not yet implemented
-;; TODO: is there any other way of raising an exception?
 (func $not_implemented
-  (drop (i32.div_u (i32.const 1) (i32.const 0)))
+  unreachable
 )
 
 ;; ===================================================
-;; Instruction functions
+;; Interpreter functions
 ;;
 ;; $cf and $r? parameters are i32 because they are passed as 
 ;;  indices (eg. 1st call frame is 0, r0 is 0, r1 is 1,...)
@@ -119,10 +123,11 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; goto location
 (func $goto (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $ip_set 
-    (local.get $cf) 
-    (call $ip_get_arg_1 (local.get $cf))
-  )
+  (local $location i32)
+  
+  (local.set $location (call $ip_get_arg_1 (local.get $cf)))
+  (call $insn::goto (local.get $cf))
+  (call $ip_set (local.get $cf) (local.get $location))
 )
 ;; goto_if_equal location
 (func $goto_if_equal (param $state i32) (param $cf i32) (param $opcodes i32)
@@ -334,11 +339,15 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; ret index
 (func $ret (param $state i32) (param $cf i32) (param $opcodes i32)
+
+  ;; TODO: implement the C++ equivalent - don't know how to do that for now
+  ;; state->vm()->checkpoint(state);
+
   ;; TODO: implement some more stack management logic as in
   ;; and also see how to return the stack top value as instruction function
   ;; type doesn't allow a (result i32) - see type $insn_t
   ;; https://github.com/rubinius/rubinius/blob/36e2be5ee5a06dbd788870e3692b397abdc9f4f3/machine/instructions/ret.hpp
-  (drop (call $stack_top (local.get $cf)))
+  (drop (return (call $insn::ret (local.get $state) (local.get $cf))))
 )
 ;; rotate count
 (func $rotate (param $state i32) (param $cf i32) (param $opcodes i32)
@@ -562,15 +571,13 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; b_if r0, ip
 (func $b_if (param $state i32) (param $cf i32) (param $opcodes i32)
+  (local $r0 i32)
+
+  (local.set $r0 (call $ip_get_arg_1 (local.get $cf)))
   (if
-    (i64.eqz
-      (call $reg_get
-        (local.get $cf)
-        (call $ip_get_arg_1 (local.get $cf))
-      )
-    )    
+    (i32.eqz (call $insn::b_if (local.get $cf) (local.get $r0)))
     (then 
-      ;; == 0 means false, don't branch
+      ;; == 0 means false, don't branch keep going
       (call $ip_next (local.get $cf) )
     )
     (else
@@ -584,13 +591,10 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; r_load_local r0, local
 (func $r_load_local (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $reg_set
+  (call $insn::r_load_local 
     (local.get $cf)
-    (call $ip_get_arg_1 (local.get $cf))
-    (call $local_get 
-      (local.get $cf) 
-      (call $ip_get_arg_2 (local.get $cf))
-    )
+    (call $ip_get_arg_1 (local.get $cf)) ;; register id
+    (call $ip_get_arg_2 (local.get $cf)) ;; local id
   )
   (call $ip_next (local.get $cf))
 )
@@ -614,12 +618,9 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 (func $r_store_stack (param $state i32) (param $cf i32) (param $opcodes i32)
   ;; TODO: check if we need to implement the RVAL logic as in
   ;; https://github.com/rubinius/rubinius/blob/36e2be5ee5a06dbd788870e3692b397abdc9f4f3/machine/instructions/r_store_stack.hpp
-  (call $stack_push 
+  (call $insn::r_store_stack  
     (local.get $cf)
-    (call $reg_get 
-      (local.get $cf) 
-      (call $ip_get_arg_1 (local.get $cf))
-    )
+    (call $ip_get_arg_1 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
@@ -629,60 +630,40 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; r_load_int r0, r1
 (func $r_load_int (param $state i32) (param $cf i32) (param $opcodes i32)
-  ;; TODO: must be modified to include the fixnum logic 
-  ;; (see https://github.com/rubinius/rubinius/blob/master/machine/instructions/r_load_int.hpp)
-  (call $reg_set
+  (call $insn::r_load_int  
+    (local.get $state)
     (local.get $cf)
     (call $ip_get_arg_1 (local.get $cf))
-    (call $reg_get 
-      (local.get $cf) 
-      (call $ip_get_arg_2 (local.get $cf))
-    )
+    (call $ip_get_arg_2 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
 ;; r_store_int r0, r1
 (func $r_store_int (param $state i32) (param $cf i32) (param $opcodes i32)
-  ;; TODO: must be modified to include the fixnum/bignum logic
-  ;; (https://github.com/rubinius/rubinius/blob/master/machine/instructions/r_store_int.hpp)
-  ;; For now let's just assume it's WASM int
-  (call $reg_set
-    (local.get $cf)
+  (call $insn::r_store_int
+   (local.get $state)
+   (local.get $cf)
     (call $ip_get_arg_1 (local.get $cf))
-    (call $reg_get 
-      (local.get $cf) 
-      (call $ip_get_arg_2 (local.get $cf))
-    )
+    (call $ip_get_arg_2 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
 ;; r_copy r0, r1
 (func $r_copy (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $reg_set
+  (call $insn::r_copy  
     (local.get $cf)
     (call $ip_get_arg_1 (local.get $cf))
-    (call $reg_get 
-      (local.get $cf) 
-      (call $ip_get_arg_2 (local.get $cf))
-    )
+    (call $ip_get_arg_2 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
 ;; n_iadd r0, r1, r2
 (func $n_iadd (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $reg_set
+  (call $insn::n_iadd 
     (local.get $cf)
     (call $ip_get_arg_1 (local.get $cf))
-    (i64.add
-      (call $reg_get 
-        (local.get $cf) 
-        (call $ip_get_arg_2 (local.get $cf))
-      )
-      (call $reg_get 
-        (local.get $cf) 
-        (call $ip_get_arg_3 (local.get $cf))
-      )
-    )
+    (call $ip_get_arg_2 (local.get $cf))
+    (call $ip_get_arg_3 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
@@ -728,25 +709,11 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; n_ile r0, r1, r2
 (func $n_ile (param $state i32) (param $cf i32) (param $opcodes i32)
-  (if 
-    (i64.le_s
-      (call $reg_get (local.get $cf) (call $ip_get_arg_2 (local.get $cf))) ;; r1
-      (call $reg_get (local.get $cf) (call $ip_get_arg_3 (local.get $cf))) ;; r2
-    )
-    (then    
-      (call $reg_set ;; r0 = 1 (true)
-        (local.get $cf) 
-        (call $ip_get_arg_1 (local.get $cf)) 
-        (i64.const 1)
-      )
-    )
-    (else
-      (call $reg_set ;; r0 = 0 (false)
-        (local.get $cf) 
-          (call $ip_get_arg_1 (local.get $cf)) 
-          (i64.const 0)
-        )
-    )
+  (call $insn::n_ile
+    (local.get $cf)
+    (call $ip_get_arg_1 (local.get $cf))
+    (call $ip_get_arg_2 (local.get $cf))
+    (call $ip_get_arg_3 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
@@ -756,25 +723,11 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; n_ige r0, r1, r2
 (func $n_ige (param $state i32) (param $cf i32) (param $opcodes i32)
-  (if 
-    (i64.ge_s
-      (call $reg_get (local.get $cf) (call $ip_get_arg_2 (local.get $cf))) ;; r1
-      (call $reg_get (local.get $cf) (call $ip_get_arg_3 (local.get $cf))) ;; r2
-    )
-    (then    
-      (call $reg_set ;; r0 = 1 (true)
-        (local.get $cf) 
-        (call $ip_get_arg_1 (local.get $cf)) 
-        (i64.const 1)
-      )
-    )
-    (else
-      (call $reg_set ;; r0 = 0 (false)
-        (local.get $cf) 
-          (call $ip_get_arg_1 (local.get $cf)) 
-          (i64.const 0)
-        )
-    )
+  (call $insn::n_ige
+    (local.get $cf)
+    (call $ip_get_arg_1 (local.get $cf))
+    (call $ip_get_arg_2 (local.get $cf))
+    (call $ip_get_arg_3 (local.get $cf))
   )
   (call $ip_next (local.get $cf))
 )
@@ -900,13 +853,13 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; goto_past location
 (func $goto_past (param $state i32) (param $cf i32) (param $opcodes i32)
+  (local $location i32)
+
+  (local.set $location (call $ip_get_arg_1 (local.get $cf)))
   ;; TODO: the rbx interperter does a 'state->vm()->checkpoint(state)'
   ;; but I'm not sure what it means
   ;; for now just branch to the given location
-  (call $ip_set 
-    (local.get $cf) 
-    (call $ip_get_arg_1 (local.get $cf))
-  )  
+  (call $ip_set (local.get $cf) (local.get $location))  
 )
 ;; goto_future location
 (func $goto_future (param $state i32) (param $cf i32) (param $opcodes i32)
@@ -918,10 +871,9 @@ $r_load_1 $r_load_nil $r_load_false $r_load_true $call_send $call $call_0 $push_
 )
 ;; r_load_1 r0
 (func $r_load_1 (param $state i32) (param $cf i32) (param $opcodes i32)
-  (call $reg_set
-    (local.get $cf)
+  (call $insn::r_load_1
+    (local.get $cf) 
     (call $ip_get_arg_1 (local.get $cf))
-    (i64.const 1)
   )
   (call $ip_next (local.get $cf))
 )

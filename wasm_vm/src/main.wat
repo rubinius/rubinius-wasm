@@ -12,7 +12,7 @@
   (export "main_js" (func $main_js))
 
   ;; Entry point for CLI execution
-  ;;(start $main)
+  (start $main)
 
   ;; Invoke the fib method from wasm-interp command line
   ;; WASM start entry point cannot accept argument

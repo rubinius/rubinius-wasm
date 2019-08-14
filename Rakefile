@@ -9,10 +9,10 @@ require 'fileutils'
 
 VM_DIR = './wasm_vm'
 WAT_DIR = File.join(VM_DIR, 'src')
-ERB_FILE = File.join(VM_DIR, 'rbx.erb')
+ERB_FILE = File.join(VM_DIR, 'rw.erb')
 BUILD_DIR = File.join('./build')
-WAT_VM_FILE = File.join(BUILD_DIR, 'src', 'rbx.wat')
-WASM_VM_FILE = File.join(BUILD_DIR, 'bin', 'rbx.wasm')
+WAT_VM_FILE = File.join(BUILD_DIR, 'src', 'rw.wat')
+WASM_VM_FILE = File.join(BUILD_DIR, 'bin', 'rw.wasm')
 
 # ERB render method used in rbx.erb
 def render(filename)
