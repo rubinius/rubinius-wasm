@@ -6,12 +6,12 @@
 
   (export "memory" (memory $0))
 
-  <% ['malloc', 'free', 'morecore', 'sbrk', 'get_freep', 'set_freep',
+  <% ['malloc', 'morecore', 'sbrk', 'get_freep', 
       'set_hdr_ptr', 'get_hdr_ptr', 'set_hdr_size', 'get_hdr_size'].each do |f| %>
     (export "<%= f %>" (func $<%= f %>))
   <% end %>
 
-  ;; use a smaller memory for the test
+  ;; use a small 1 page memory for testing
   <%# render 'memory.wat' %>
   (memory $0 1)
 
@@ -20,17 +20,30 @@
   <%= render 'malloc.wat' %>
 
   ;; wasmer API doesn't handle function with no return value :-(
+  ;; so use proxy functions with a fake return value
+  (export "set_freep" (func $proxy_set_freep))
   (func $proxy_set_freep (param $ptr i32) (result i32)
     (call $set_freep (local.get $ptr))
     (i32.const 0)
   )
-  (export "proxy_set_freep" (func $proxy_set_freep))
 
-  ;; wasmer ruby est doesn't have the memory.size entry point
+  (export "free" (func $proxy_free))
+  (func $proxy_free (param $ap i32) (result i32)
+    (call $free (local.get $ap))
+    (i32.const 0)
+  )
+  
+
+  ;; wasmer ruby extension doesn't have the memory.size entry point
   (func $memory_size (result i32)
     (return (memory.size))
   )
   (export "memory_size" (func $memory_size))
 
+  ;; access global variables
+  (func $global_heap (result i32) (global.get $HEAP))
+  (func $global_heap_size (result i32) (global.get $HEAP_SIZE))
+  (export "global_heap" (func $global_heap))
+  (export "global_heap_size" (func $global_heap_size))
 
 )

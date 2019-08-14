@@ -11,3 +11,7 @@
   
   ;; debug flag (1=true, 0=false)
   (global $DEBUG (mut i32) (i32.const 0)) 
+
+  ;; size of memory chunks allocated at once by malloc::morecore
+  ;; (in number of units)
+  (global $NALLOC (mut i32) (i32.const 1024))
