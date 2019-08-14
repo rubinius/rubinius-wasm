@@ -2,13 +2,15 @@
 ;; from K&R C Language 2nd Edition p 185-189
 ;; (see https://www.dipmat.univpm.it/~demeio/public/the_c_programming_language_2.pdf)
 ;;
+;; For a detailed explanation of the allocator see
+;; https://gnuchops.wordpress.com/2013/02/26/memory-allocator-for-embedded-system-k-r-ritchie-book/
 
 
-;; maximum amount of memory the heap can grow
+;; Maximum amount of memory the heap can grow
 ;; NOTE: must be less than the upper WASM memory limit (4GB)
 (global $HEAP_MAX_SIZE (mut i32) (i32.const 1073741824)) ;; 1GB
 
-;; current heap size (starts at 0, the first malloc will
+;; Current heap size (starts at 0, the first malloc will
 ;; set it up)
 (global $HEAP_SIZE (mut i32) (i32.const 0))
 
