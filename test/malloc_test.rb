@@ -12,9 +12,7 @@ class MallocTest < Minitest::Test
   @@bytes = File.read(wasm_path)
 
   def setup
-    # According to doc it should be Wasmer::Instance but
-    # look like there is a bug
-    @instance = Instance.new(@@bytes)
+    @instance = Wasmer::Instance.new(@@bytes)
   end
 
   def test_initial_memory_size

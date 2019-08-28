@@ -4,4 +4,4 @@
 
 source 'https://rubygems.org'
 
-gem 'wasmer', '~> 0.2.0'
+gem 'wasmer', '~> 0.3.0'
