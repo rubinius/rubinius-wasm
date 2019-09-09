@@ -16,12 +16,10 @@ builder = Rack::Builder.new do
 
   map "/build" do
     use Rack::Static, urls: [""],
-                      root: File.expand_path('../build')
+                      root: File.expand_path('../../build')
     run lambda {}
   end
 
 end
 
 Rack::Handler::WEBrick.run builder
-#handler = Rack::Handler::WEBrick
-#handler.run Rack::File.new(".")
