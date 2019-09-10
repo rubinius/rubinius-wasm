@@ -1,4 +1,4 @@
-# Rubinius WebAssembly (Rw)
+# Rubinius WebAssembly (rW)
 
 A WebAssembly implementation of the Rubinius instruction set.
 
@@ -45,7 +45,7 @@ called host host.print(i64:987) =>
 and indeed fib(16) is 987 :-)
 
 ## Development
-The Rw code is in `wasm_vm/src`. The individual WAT files are assambled and compiled through a rake recipe. If you modify any of the WAT files you'll need to build the Rw.wasm again with `rake build`.
+The rW code is in `wasm_vm/src`. The individual WAT files are assambled and compiled through a rake recipe. If you modify any of the WAT files you'll need to build the rW.wasm again with `rake build`.
 
 ```
 $ rake assemble # put the individual WAT files together according to the `wasm_vm/rw.erb` template
