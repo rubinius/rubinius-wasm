@@ -57,7 +57,7 @@ $ rake test     # run all tests (requires wasmer - see above)
 
 ## Code of Conduct
 
-Participation in the Rubinius project is governed by the Rubinius [Code of Conduct](https://rubinius.com/code-of-conduct/).
+Participation in the Rubinius WebAssembly project is governed by the Rubinius [Code of Conduct](https://rubinius.com/code-of-conduct/).
 
 ## License
 
