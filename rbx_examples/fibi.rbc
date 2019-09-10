@@ -1,0 +1,83 @@
+
+============= :__script__ ==============
+Arguments:   0 required, 0 post, 0 total
+Arity:       0
+Locals:      0
+Stack size:  5
+Registers:   0
+Literals:    4: :fibi, <compiled code>, :method_visibility, :add_defn_method
+Lines to IP: 1: 0..19
+
+0000:  push_rubinius              
+0001:  push_literal               :fibi
+0003:  push_literal               #<Rubinius::CompiledCode:0x380 name=fibi file=fibi.rb line=1>
+0005:  push_scope                 
+0006:  push_variables             
+0007:  send_method                :method_visibility
+0009:  unwind                     0
+0011:  send_stack                 :add_defn_method, 4
+0014:  unwind                     0
+0016:  pop                        
+0017:  push_true                  
+0018:  ret                        0
+----------------------------------------
+
+================ :fibi =================
+Arguments:   1 required, 0 post, 1 total
+Arity:       1
+Locals:      5: n, i, a, b, t
+Stack size:  7
+Registers:   0
+Literals:    2: :<, :+
+Line:        1
+Lines to IP: 2: 0..17, 0: 18..18, 3: 19..23, 4: 24..28, 5: 29..33, 6: 34..44, 7: 45..49, 8: 50..61, 9: 62..66, 10: 67..81, 0: 82..83, 12: 84..87
+
+0000:  push_local                 0    # n
+0002:  push_int                   2
+0004:  send_stack                 :<, 1
+0007:  unwind                     0
+0009:  goto_if_false              0017:
+0011:  push_local                 0    # n
+0013:  ret                        0
+0015:  goto                       0018:
+0017:  push_nil                   
+0018:  pop                        
+0019:  push_int                   2
+0021:  set_local                  1    # i
+0023:  pop                        
+0024:  push_int                   1
+0026:  set_local                  2    # a
+0028:  pop                        
+0029:  push_int                   1
+0031:  set_local                  3    # b
+0033:  pop                        
+0034:  push_local                 1    # i
+0036:  push_local                 0    # n
+0038:  send_stack                 :<, 1
+0041:  unwind                     0
+0043:  goto_if_false              0082:
+0045:  push_local                 2    # a
+0047:  set_local                  4    # t
+0049:  pop                        
+0050:  push_local                 2    # a
+0052:  push_local                 3    # b
+0054:  send_stack                 :+, 1
+0057:  unwind                     0
+0059:  set_local                  2    # a
+0061:  pop                        
+0062:  push_local                 4    # t
+0064:  set_local                  3    # b
+0066:  pop                        
+0067:  push_local                 1    # i
+0069:  push_int                   1
+0071:  send_stack                 :+, 1
+0074:  unwind                     0
+0076:  set_local                  1    # i
+0078:  pop                        
+0079:  check_interrupts           
+0080:  goto                       0034:
+0082:  push_nil                   
+0083:  pop                        
+0084:  push_local                 2    # a
+0086:  ret                        0
+----------------------------------------

@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html>
+<head>
+  <script>
+    var importObject = {
+      host: {
+        print: function(arg) {
+          console.log(arg);
+        }
+      }
+    };
+    // Load the module using the newest Streaming API
+    WebAssembly.instantiateStreaming(fetch('/build/bin/rw.wasm'), importObject)
+    .then(obj => {
+        // Add a listener to the button so we can execute the 
+        // main_js function when the button is pressed.
+        var button = document.getElementById('run');
+        button.addEventListener('click', function() {
+          var n = +document.getElementById('n').value;
+          console.log(n);
+          var fib_n = obj.instance.exports.main_js(n);
+          console.log(fib_n);
+          document.getElementById('fib_n').innerHTML = fib_n;
+          //console.log(obj.instance.exports.main_js(16));
+        }, false);
+      }
+    );
+  </script>
+</head>
+<body>
+  <h1>Rubinius WASM VM test</h1>
+
+  <p>Fibonacci terms</p>
+  n = <input type="text" size=6 id="n" value=16>
+  <input type="button" id="run" value="Run"/>
+  <p id="fib_n">-</p>
+</body>
+</html>

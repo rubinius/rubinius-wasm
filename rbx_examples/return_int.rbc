@@ -1,0 +1,43 @@
+
+============= :__script__ ==============
+Arguments:   0 required, 0 post, 0 total
+Arity:       0
+Locals:      0
+Stack size:  5
+Registers:   0
+Literals:    4: :main, <compiled code>, :method_visibility, :add_defn_method
+Lines to IP: 1: 0..16, 5: 17..26
+
+0000:  push_rubinius              
+0001:  push_literal               :main
+0003:  push_literal               #<Rubinius::CompiledCode:0x380 name=main file=rbx_examples/return_int.rb line=1>
+0005:  push_scope                 
+0006:  push_variables             
+0007:  send_method                :method_visibility
+0009:  unwind                     0
+0011:  send_stack                 :add_defn_method, 4
+0014:  unwind                     0
+0016:  pop                        
+0017:  push_self                  
+0018:  allow_private              
+0019:  send_method                :main
+0021:  unwind                     0
+0023:  pop                        
+0024:  push_true                  
+0025:  ret                        0
+----------------------------------------
+
+================ :main =================
+Arguments:   0 required, 0 post, 0 total
+Arity:       0
+Locals:      0
+Stack size:  1
+Registers:   0
+Literals:    0
+Line:        1
+Lines to IP: 2: 0..5
+
+0000:  push_int                   42
+0002:  ret                        0
+0004:  ret                        0
+----------------------------------------

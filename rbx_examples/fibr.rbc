@@ -1,0 +1,64 @@
+
+============= :__script__ ==============
+Arguments:   0 required, 0 post, 0 total
+Arity:       0
+Locals:      0
+Stack size:  5
+Registers:   0
+Literals:    4: :fib, <compiled code>, :method_visibility, :add_defn_method
+Lines to IP: 1: 0..19
+
+0000:  push_rubinius              
+0001:  push_literal               :fib
+0003:  push_literal               #<Rubinius::CompiledCode:0x380 name=fib file=fibr.rb line=1>
+0005:  push_scope                 
+0006:  push_variables             
+0007:  send_method                :method_visibility
+0009:  unwind                     0
+0011:  send_stack                 :add_defn_method, 4
+0014:  unwind                     0
+0016:  pop                        
+0017:  push_true                  
+0018:  ret                        0
+----------------------------------------
+
+================= :fib =================
+Arguments:   1 required, 0 post, 1 total
+Arity:       1
+Locals:      1: n
+Stack size:  5
+Registers:   0
+Literals:    4: :<, :-, :fib, :+
+Line:        1
+Lines to IP: 2: 0..17, 0: 18..18, 3: 19..57
+
+0000:  push_local                 0    # n
+0002:  push_int                   2
+0004:  send_stack                 :<, 1
+0007:  unwind                     0
+0009:  goto_if_false              0017:
+0011:  push_local                 0    # n
+0013:  ret                        0
+0015:  goto                       0018:
+0017:  push_nil                   
+0018:  pop                        
+0019:  push_self                  
+0020:  push_local                 0    # n
+0022:  push_int                   2
+0024:  send_stack                 :-, 1
+0027:  unwind                     0
+0029:  allow_private              
+0030:  send_stack                 :fib, 1
+0033:  unwind                     0
+0035:  push_self                  
+0036:  push_local                 0    # n
+0038:  push_int                   1
+0040:  send_stack                 :-, 1
+0043:  unwind                     0
+0045:  allow_private              
+0046:  send_stack                 :fib, 1
+0049:  unwind                     0
+0051:  send_stack                 :+, 1
+0054:  unwind                     0
+0056:  ret                        0
+----------------------------------------
