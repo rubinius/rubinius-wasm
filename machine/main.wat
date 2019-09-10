@@ -20,6 +20,6 @@
   (func $main
     ;; compute fib(16) -> 987
     (call $log_i64
-      (call $interpret (i64.const 16))
+      (call $interpret (i64.const 17))
     )
   )

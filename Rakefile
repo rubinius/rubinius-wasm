@@ -7,10 +7,9 @@ require "rake/testtask"
 require 'erb'
 require 'fileutils'
 
-VM_DIR = './wasm_vm'
-WAT_DIR = File.join(VM_DIR, 'src')
-ERB_FILE = File.join(VM_DIR, 'rw.erb')
+WAT_DIR = './machine'
 BUILD_DIR = File.join('./build')
+ERB_FILE = File.join(BUILD_DIR, 'rw.erb')
 WAT_VM_FILE = File.join(BUILD_DIR, 'src', 'rw.wat')
 WASM_VM_FILE = File.join(BUILD_DIR, 'bin', 'rw.wasm')
 
@@ -43,7 +42,7 @@ end
 
 desc 'Clean build tree'
 task :clean do
-  FileUtils.rm_rf(BUILD_DIR)
+  FileUtils.rm_rf(WAT_VM_FILE, WASM_VM_FILE)
 end
 
 desc 'Create build tree'

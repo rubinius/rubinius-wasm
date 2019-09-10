@@ -21,7 +21,7 @@ This is very preliminary, non-functional implemenentation right now. What has be
 * Then run `bundle install` to install all gems needed (you can either use rubinius Ruby or MRI Ruby 2.6.3)
 
 ## Running
-Right now the only code you can run is the iterative fib (fibi) code hardcoded in the `wasm_vm/src/data.wat` file (see line 1385 to 1470)
+Right now the only code you can run is the iterative fib (fibi) code hardcoded in the `machine/data.wat` file (see line 1385 to 1470)
 
 To run the fibi function:
 ```
@@ -32,7 +32,7 @@ $ ruby ./server.rb
 
 then launch a WASM enabled browser (I use Chrome but Firefox, Safari or IE should work too) and visit http://localhost:8080/. Chose the value of n and then click on the `Run` button. The corresponding Fibonacci value should appear right below and in the browser console too.
 
-To run the Ruby WASM VM from the command line, edit the wasm_vm/src/main.wat and remove the `;;` comment from the line `;; (start $main)`, optionally change the value of n (16 by default) in the $main function right below, then
+To run the Ruby WASM VM from the command line, edit the machine/main.wat and remove the `;;` comment from the line `;; (start $main)`, optionally change the value of n (16 by default) in the $main function right below, then
 ```
 $ rake build
 $ rake run
@@ -45,10 +45,10 @@ called host host.print(i64:987) =>
 and indeed fib(16) is 987 :-)
 
 ## Development
-The rW code is in `wasm_vm/src`. The individual WAT files are assambled and compiled through a rake recipe. If you modify any of the WAT files you'll need to build the rW.wasm again with `rake build`.
+The rW code is in `machine/`. The individual WAT files are assambled and compiled through a rake recipe. If you modify any of the WAT files you'll need to build the rW.wasm again with `rake build`.
 
 ```
-$ rake assemble # put the individual WAT files together according to the `wasm_vm/rw.erb` template
+$ rake assemble # put the individual WAT files together according to the `machine/rw.erb` template
 $ rake compile  # compile the assembled WAT build/src/rw.wat into buid/bin/rw.wasm
 $ rake build    # assemble + compile
 $ rake run      # run the fibi function from the command line
