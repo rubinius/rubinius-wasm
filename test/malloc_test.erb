@@ -6,7 +6,7 @@
 
   (export "memory" (memory $0))
 
-  <% ['malloc', 'morecore', 'sbrk', 'get_freep', 
+  <% ['malloc', 'morecore', 'sbrk', 'get_freep', 'set_freep', 'free', 
       'set_hdr_ptr', 'get_hdr_ptr', 'set_hdr_size', 'get_hdr_size'].each do |f| %>
     (export "<%= f %>" (func $<%= f %>))
   <% end %>
@@ -18,21 +18,6 @@
   <%= render 'global.wat' %>
   <%= render 'data.wat' %>
   <%= render 'malloc.wat' %>
-
-  ;; wasmer API doesn't handle function with no return value :-(
-  ;; so use proxy functions with a fake return value
-  (export "set_freep" (func $proxy_set_freep))
-  (func $proxy_set_freep (param $ptr i32) (result i32)
-    (call $set_freep (local.get $ptr))
-    (i32.const 0)
-  )
-
-  (export "free" (func $proxy_free))
-  (func $proxy_free (param $ap i32) (result i32)
-    (call $free (local.get $ap))
-    (i32.const 0)
-  )
-  
 
   ;; wasmer ruby extension doesn't have the memory.size entry point
   (func $memory_size (result i32)
