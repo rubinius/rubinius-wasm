@@ -27,7 +27,7 @@ module RW::Wat
     # Create a tempfile with .wat extension from 
     # an erb template
     def self.assemble(erb_filename, include_paths = nil)
-      include_paths ||= ['.', File.expand_path('../../machine/src', erb_filename)]
+      include_paths ||= ['.', File.expand_path('../../machine', erb_filename)]
       renderer = Renderer.new(include_paths)
       tf = Tempfile.new([File.basename(erb_filename), '.wat'])
       tf.persist! # do not delete tempfile if inspection needed
