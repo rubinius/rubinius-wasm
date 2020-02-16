@@ -3,12 +3,8 @@
 # All rights reserved.
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'rw'
+require 'rw' # builder classes
 
 require 'minitest/autorun'
 
-def build_wasm(erb_path)
-  wat_file = RW::Wat::WatFile.assemble(erb_path)
-  wat_file.compile
-  wat_file.wasm_path
-end
+

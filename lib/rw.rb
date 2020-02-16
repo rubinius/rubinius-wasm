@@ -6,4 +6,5 @@ module RW
   require 'rw/version'
   require 'rw/ext'
   require 'rw/wat'
+  require 'rw/rlang'
 end
